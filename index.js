@@ -1,38 +1,78 @@
+// Import necessary modules
 const express = require('express');
+const cors = require('cors');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+// Create an Express app
 const app = express();
-const DB = require('./database.js');
 
-// The service port. In production the application is statically hosted by the service on the same port.
-const port = process.argv.length > 2 ? process.argv[2] : 3000;
-
-// JSON body parsing using built-in middleware
+// Set up middleware
 app.use(express.json());
-
-// Serve up the applications static content
 app.use(express.static('public'));
+app.use(cors()); // Enable CORS for all routes
 
-// Router for service endpoints
-var apiRouter = express.Router();
+// Set up the MongoDB connection (optional, depending on your application requirements)
+const uri = "mongodb+srv://cs260:GJLout9%40@cluster0.gf6epqk.mongodb.net/bnb";
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+// Handle API routes
+const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
-// GetScores
-apiRouter.get('/scores', async (_req, res) => {
-  const scores = await DB.getHighScores();
+let scores = [];
+
+// Get scores
+apiRouter.get('/scores', (_req, res) => {
   res.send(scores);
 });
 
-// SubmitScore
-apiRouter.post('/score', async (req, res) => {
-  DB.addScore(req.body);
-  const scores = await DB.getHighScores();
-  res.send(scores);
+// Submit score
+apiRouter.post('/score', (req, res) => {
+  try {
+    scores = updateScores(req.body, scores);
+    res.status(200).send(scores);
+  } catch (error) {
+    console.error('Error updating scores:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
-// Return the application's default page if the path is unknown
+// Handle default route
 app.use((_req, res) => {
-  res.sendFile('index.html', {root: 'public'});
+  res.sendFile('index.html', { root: 'public' });
 });
 
+// Start the server
+const port = process.argv.length > 2 ? process.argv[2] : 3000;
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+// Update scores logic
+function updateScores(newScore, scores) {
+  let found = false;
+  for (const [i, prevScore] of scores.entries()) {
+    if (newScore.score > prevScore.score) {
+      scores.splice(i, 0, newScore);
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    scores.push(newScore);
+  }
+
+  if (scores.length > 10) {
+    scores.length = 10;
+  }
+
+  return scores;
+  
+}
