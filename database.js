@@ -1,23 +1,33 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://cs260:GJLout9%40@cluster0.gf6epqk.mongodb.net/bnb";
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+const { MongoClient } = require('mongodb');
+const config = require('./database');
+
+const url = "mongodb+srv://cs260:GJLout9%40@cluster0.gf6epqk.mongodb.net";
+const client = new MongoClient(url);
+const db = client.db('rental');
+const scoreCollection = db.collection('scores');
+
+// This will asynchronously test the connection and exit the process if it fails
+(async function testConnection() {
+  await client.connect();
+  await db.command({ ping: 1 });
+})().catch((ex) => {
+  console.log(`Unable to connect to database with ${url} because ${ex.message}`);
+  process.exit(1);
 });
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
+
+async function addScore(score) {
+  const result = await scoreCollection.insertOne(score);
+  return result;
 }
-run().catch(console.dir);
+
+function getHighScores() {
+  const query = { score: { $gt: 0, $lt: 900 } };
+  const options = {
+    sort: { score: -1 },
+    limit: 10,
+  };
+  const cursor = scoreCollection.find(query, options);
+  return cursor.toArray();
+}
+
+module.exports = { addScore, getHighScores };
