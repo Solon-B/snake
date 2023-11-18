@@ -4,3 +4,5 @@ node_modules/
 dbkeys.sh
 dbConfig.json
 dbConfig.json
+node_modules
+node_quickstart

@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
-const config = require('./database');
+const config = require('./dbConfig');
 
-const url = "mongodb+srv://cs260:GJLout9%40@cluster0.gf6epqk.mongodb.net";
+const url = "mongodb+srv://cs260:GJLout9%40@cluster0.gf6epqk.mongodb.net/scores";
 const client = new MongoClient(url);
 const db = client.db('rental');
 const scoreCollection = db.collection('scores');
@@ -31,3 +31,4 @@ function getHighScores() {
 }
 
 module.exports = { addScore, getHighScores };
+
