@@ -10,9 +10,10 @@ let score = 0;
 
 function getPlayerName() {
   // Retrieve the player's name from local storage or wherever it is stored
-  const playerName = localStorage.getItem("username");
+  const playerName = localStorage.getItem("userName"); // Updated key to "userName"
   return playerName || "Mystery Player"; // Return a default name if not found
 }
+
 
 function drawSnake() {
   snake.forEach((segment) => {
@@ -65,6 +66,29 @@ function checkCollision() {
     if (snake[i].x === head.x && snake[i].y === head.y) {
       gameOver();
     }
+  }
+}
+
+
+async function saveScore(score) {
+  const userName = getPlayerName();
+  const date = new Date().toLocaleDateString();
+  const newScore = { name: userName, score: score, date: date };
+
+  try {
+    const response = await fetch('/api/scores', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(newScore),
+    });
+
+    // Store what the service gave us as the high scores
+    const scores = await response.json();
+    localStorage.setItem('scores', JSON.stringify(scores));
+  } catch (error) {
+    // If there was an error, log it, and then just track scores locally
+    console.error('Error saving score:', error);
+    updateScoresLocal(newScore);
   }
 }
 
@@ -176,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const usernameElement = document.getElementById("username");
 
   // Retrieve the username from local storage
-  const savedName = localStorage.getItem("username");
+  const savedName = localStorage.getItem("userName"); // Updated key to "userName"
 
   if (savedName) {
     usernameElement.textContent = savedName;
@@ -190,6 +214,7 @@ const restartButton = document.getElementById("restart-button");
 restartButton.addEventListener("click", () => {
   resetGame();
 });
+
 
 function resetGame() {
   // Clear the canvas
@@ -210,7 +235,7 @@ function resetGame() {
   clearInterval(gameInterval);
 
   // Start a new game loop
-  gameInterval = setInterval(gameLoop, 50);
+  gameInterval = setInterval(gameLoop, 100);
 }
 
 gameInterval = setInterval(gameLoop, 70);
