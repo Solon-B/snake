@@ -78,3 +78,10 @@ The about page gives photos and quotes
 - **Static middleware for frontend** - done!
 - **Backend service endpoints** - Placeholders for login that stores the current user on the server.
 - **Frontend calls service endpoints** -  I did this using the fetch function.
+
+For this deliverable I stored the high scores in the database.
+
+## DB deliverable
+- **MongoDB Atlas database created** - done!
+- **Endpoints for data** - My endpoints now process the data and send it to Mongo.
+- **Stores data in MongoDB** - done!
