@@ -9,11 +9,9 @@ let gameInterval;
 let score = 0;
 
 function getPlayerName() {
-  // Retrieve the player's name from local storage or wherever it is stored
-  const playerName = localStorage.getItem("userName"); // Updated key to "userName"
-  return playerName || "Mystery Player"; // Return a default name if not found
+  const playerName = localStorage.getItem("userName");
+  return playerName || "Mystery Player";
 }
-
 
 function drawSnake() {
   snake.forEach((segment) => {
@@ -21,14 +19,6 @@ function drawSnake() {
     ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
   });
 }
-// Simulate chat messages
-setInterval(() => {
-  const score = Math.floor(Math.random() * 1000);
-  const chatText = document.querySelector('#player-messages');
-  chatText.innerHTML =
-    `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${score}</div>` + chatText.innerHTML;
-}, 5000);
-
 
 function drawFood() {
   ctx.fillStyle = "red";
@@ -40,13 +30,12 @@ function update() {
   snake.unshift(newHead);
 
   if (newHead.x === food.x && newHead.y === food.y) {
-    // Snake ate food
     food.x = Math.floor(Math.random() * (gameBoard.width / gridSize));
     food.y = Math.floor(Math.random() * (gameBoard.height / gridSize));
-    score += 1; // Increase the score
+    score += 1;
     document.getElementById("score").innerHTML = `Score: ${score}`;
   } else {
-    snake.pop(); // Remove tail if no food eaten
+    snake.pop();
   }
 }
 
@@ -69,12 +58,10 @@ function checkCollision() {
   }
 }
 
-
 async function saveScore(score) {
   const userName = getPlayerName();
   const date = new Date().toLocaleDateString();
   const newScore = { name: userName, score: score, date: date };
-
   try {
     const response = await fetch('/api/scores', {
       method: 'POST',
@@ -82,14 +69,37 @@ async function saveScore(score) {
       body: JSON.stringify(newScore),
     });
 
-    // Store what the service gave us as the high scores
     const scores = await response.json();
     localStorage.setItem('scores', JSON.stringify(scores));
   } catch (error) {
-    // If there was an error, log it, and then just track scores locally
     console.error('Error saving score:', error);
     updateScoresLocal(newScore);
   }
+}
+
+async function updateScoresServer(score) {
+  const userName = getPlayerName();
+  const date = new Date().toLocaleDateString();
+  const newScore = { name: userName, score: score, date: date };
+
+  try {
+    const response = await fetch('/api/updateScores', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(newScore),
+    });
+
+    // Handle the response from the server if needed
+  } catch (error) {
+    console.error('Error updating scores on the server:', error);
+  }
+}
+
+function gameOver() {
+  clearInterval(gameInterval);
+  alert(`Game Over! Your score: ${score}`);
+  saveScore(score);
+  updateScoresServer(score); // Update the server with the final score
 }
 
 function gameOver() {
@@ -146,7 +156,7 @@ async function saveScore(score) {
   const newScore = { name: userName, score: score, date: date };
 
   try {
-    const response = await fetch('/api/score', {
+    const response = await fetch('/api/scores', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(newScore),
