@@ -85,3 +85,10 @@ For this deliverable I stored the high scores in the database.
 - **MongoDB Atlas database created** - done!
 - **Endpoints for data** - My endpoints now process the data and send it to Mongo.
 - **Stores data in MongoDB** - done!
+
+### Login deliverable
+this is for saving the login.
+- **User registration**  - Creates a new account in the database.
+- **existing user** - stores players under the same user if the user already exists.
+- **Use MongoDB to store credentials** - Stores both user and score 
+- **Restricts functionality** - You can not play untile you log in 
