@@ -45,6 +45,7 @@ function displayScores(scores) {
   } else {
     tableBodyEl.innerHTML = '<tr><td colSpan=4>Be the first to score</td></tr>';
   }
+  
 }
 
 loadScores();
