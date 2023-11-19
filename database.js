@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
-const config = require('./dbConfig');
+const config = require('./dbConfig.json');
 
-const url = "mongodb+srv://cs260:GJLout9%40@cluster0.gf6epqk.mongodb.net/scores";
+const url = `mongodb+srv://${config.userName}:${config.password}@${config.hostname}`;
 const client = new MongoClient(url);
 const db = client.db('rental');
 const scoreCollection = db.collection('scores');
