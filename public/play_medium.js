@@ -116,36 +116,38 @@ document.addEventListener("keydown", (event) => {
 });
 
 // Your saveScore and updateScores functions
-function saveScore(score) {
+async function saveScore(score) {
   const userName = getPlayerName();
+  const date = new Date().toLocaleDateString();
+  const newScore = { name: userName, score: score, date: date };
+
+  try {
+    const response = await fetch('/api/score', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(newScore),
+    });
+
+    // Store what the service gave us as the high scores
+    const scores = await response.json();
+    localStorage.setItem('scores', JSON.stringify(scores));
+  } catch {
+    // If there was an error then just track scores locally
+    updateScoresLocal(newScore);
+  }
+
+}
+
+function updateScoresLocal(newScore) {
   let scores = [];
   const scoresText = localStorage.getItem('scores');
   if (scoresText) {
     scores = JSON.parse(scoresText);
   }
-  scores = updateScores(userName, score, scores);
-
-  localStorage.setItem('scores', JSON.stringify(scores));
-}
-// Function to simulate chat messages
-function simulateChat() {
-  const chatText = document.querySelector('.chat');
-  const score = Math.floor(Math.random() * 1000);
-  const message = `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${score}</div>`;
-  chatText.insertAdjacentHTML('afterbegin', message);
-}
-
-// Call the function to start the chat simulation
-setInterval(simulateChat, 5000);
-
-
-function updateScores(userName, score, scores) {
-  const date = new Date().toLocaleDateString();
-  const newScore = { name: userName, score: score, date: date };
 
   let found = false;
   for (const [i, prevScore] of scores.entries()) {
-    if (score > prevScore.score) {
+    if (newScore.score > prevScore.score) {
       scores.splice(i, 0, newScore);
       found = true;
       break;
@@ -157,11 +159,29 @@ function updateScores(userName, score, scores) {
   }
 
   if (scores.length > 10) {
-    scores.pop();
+    scores.length = 10;
   }
 
-  return scores;
+  localStorage.setItem('scores', JSON.stringify(scores));
 }
+function simulateChat() {
+  const chatText = document.querySelector('.chat');
+  const newScore = Math.floor(Math.random() * 1000);
+  const message = `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${newScore}</div>`;
+  chatText.insertAdjacentHTML('afterbegin', message);
+  saveScore(newScore); // Save the score when simulating chat
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const usernameElement = document.getElementById("username");
+
+  // Retrieve the username from local storage
+  const savedName = localStorage.getItem("username");
+
+  if (savedName) {
+    usernameElement.textContent = savedName;
+  }
+});
 
 // Get a reference to the restart button
 const restartButton = document.getElementById("restart-button");
@@ -190,16 +210,7 @@ function resetGame() {
   clearInterval(gameInterval);
 
   // Start a new game loop
-  gameInterval = setInterval(gameLoop, 100);
+  gameInterval = setInterval(gameLoop, 70);
 }
 
 gameInterval = setInterval(gameLoop, 50);
-
-
-// Simulate chat messages
-setInterval(() => {
-  const score = Math.floor(Math.random() * 1000);
-  const chatText = document.querySelector('#player-messages');
-  chatText.innerHTML =
-    `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${score}</div>` + chatText.innerHTML;
-}, 5000);
