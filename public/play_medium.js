@@ -248,4 +248,4 @@ function resetGame() {
   gameInterval = setInterval(gameLoop, 100);
 }
 
-gameInterval = setInterval(gameLoop, 30);
+gameInterval = setInterval(gameLoop, 50);
