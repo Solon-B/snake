@@ -1,7 +1,7 @@
 (async () => {
   const userName = localStorage.getItem('userName');
   if (userName) {
-    document.querySelector('#playerName').textContent = userName;
+    document.querySelector('#playerName').textContent = userName;//this is  not causing any real problums all is working as intended
     setDisplay('loginControls', 'none');
     setDisplay('playControls', 'block');
   } else {
