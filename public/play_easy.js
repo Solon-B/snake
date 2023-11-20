@@ -61,9 +61,9 @@ function checkCollision() {
 
 
 async function updateScoresServer(score) {
-  const userName = getPlayerName();
+  const username = getPlayerName();
   const date = new Date().toLocaleDateString();
-  const newScore = { name: userName, score: score, date: date };
+  const newScore = { name: username, score: score, date: date };
 
   try {
     const response = await fetch('/api/updateScores', {
@@ -129,9 +129,9 @@ document.addEventListener("keydown", (event) => {
 
 // Your saveScore and updateScores functions
 async function saveScore(score) {
-  const userName = getPlayerName();
+  const username = getPlayerName();
   const date = new Date().toLocaleDateString();
-  const newScore = { name: userName, score: score, date: date };
+  const newScore = { name: username, score: score, date: date };
 
   try {
     const response = await fetch('/api/scores', {
@@ -179,7 +179,7 @@ function updateScoresLocal(newScore) {
 function simulateChat() {
   const chatText = document.querySelector('.chat');
   const newScore = Math.floor(Math.random() * 1000);
-  const message = `<div class="event"><span class="player-event">${getPlayername()}</span> scored ${newScore}</div>`;
+  const message = `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${newScore}</div>`;
   chatText.insertAdjacentHTML('afterbegin', message);
   saveScore(newScore); // Save the score when simulating chat
 }
@@ -188,10 +188,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const usernameElement = document.getElementById("username");
 
   // Retrieve the username from local storage
-  const savedname = localStorage.getItem("username"); // Updated key to "userName"
+  const savedName = localStorage.getItem("userName"); // Updated key to "userName"
 
-  if (savedname) {
-    usernameElement.textContent = savedname;
+  if (savedName) {
+    usernameElement.textContent = savedName;
   }
 });
 
@@ -226,4 +226,4 @@ function resetGame() {
   gameInterval = setInterval(gameLoop, 100);
 }
 
-gameInterval = setInterval(gameLoop, 30);
+gameInterval = setInterval(gameLoop, 70);
