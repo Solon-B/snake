@@ -58,24 +58,7 @@ function checkCollision() {
   }
 }
 
-async function saveScore(score) {
-  const userName = getPlayerName();
-  const date = new Date().toLocaleDateString();
-  const newScore = { name: userName, score: score, date: date };
-  try {
-    const response = await fetch('/api/scores', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(newScore),
-    });
 
-    const scores = await response.json();
-    localStorage.setItem('scores', JSON.stringify(scores));
-  } catch (error) {
-    console.error('Error saving score:', error);
-    updateScoresLocal(newScore);
-  }
-}
 
 async function updateScoresServer(score) {
   const userName = getPlayerName();
@@ -102,11 +85,6 @@ function gameOver() {
   updateScoresServer(score); // Update the server with the final score
 }
 
-function gameOver() {
-  clearInterval(gameInterval);
-  alert(`Game Over! Your score: ${score}`);
-  saveScore(score);
-}
 
 function clearBoard() {
   ctx.clearRect(0, 0, gameBoard.width, gameBoard.height);
@@ -201,7 +179,7 @@ function updateScoresLocal(newScore) {
 function simulateChat() {
   const chatText = document.querySelector('.chat');
   const newScore = Math.floor(Math.random() * 1000);
-  const message = `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${newScore}</div>`;
+  const message = `<div class="event"><span class="player-event">${getPlayername()}</span> scored ${newScore}</div>`;
   chatText.insertAdjacentHTML('afterbegin', message);
   saveScore(newScore); // Save the score when simulating chat
 }
@@ -210,10 +188,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const usernameElement = document.getElementById("username");
 
   // Retrieve the username from local storage
-  const savedName = localStorage.getItem("userName"); // Updated key to "userName"
+  const savedname = localStorage.getItem("username"); // Updated key to "userName"
 
-  if (savedName) {
-    usernameElement.textContent = savedName;
+  if (savedname) {
+    usernameElement.textContent = savedname;
   }
 });
 
@@ -248,4 +226,4 @@ function resetGame() {
   gameInterval = setInterval(gameLoop, 100);
 }
 
-gameInterval = setInterval(gameLoop, 70);
+gameInterval = setInterval(gameLoop, 30);

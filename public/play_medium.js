@@ -58,24 +58,6 @@ function checkCollision() {
   }
 }
 
-async function saveScore(score) {
-  const userName = getPlayerName();
-  const date = new Date().toLocaleDateString();
-  const newScore = { name: userName, score: score, date: date };
-  try {
-    const response = await fetch('/api/scores', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(newScore),
-    });
-
-    const scores = await response.json();
-    localStorage.setItem('scores', JSON.stringify(scores));
-  } catch (error) {
-    console.error('Error saving score:', error);
-    updateScoresLocal(newScore);
-  }
-}
 
 async function updateScoresServer(score) {
   const userName = getPlayerName();
