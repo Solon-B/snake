@@ -8,7 +8,7 @@
     setDisplay('loginControls', 'block');
     setDisplay('playControls', 'none');
   }
-})();
+})
 
 async function loginUser() {
   loginOrCreate(`/api/auth/login`);
