@@ -1,5 +1,12 @@
 const gameBoard = document.getElementById("game-board");
 const ctx = gameBoard.getContext("2d");
+const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
+const socket = configureWebSocket(protocol); // Use the socket variable from the configuration
+
+
+
+const GameEndEvent = 'gameEnd';
+const GameStartEvent = 'gameStart';
 const gridSize = 10;
 let snake = [{ x: 10, y: 10 }];
 let food = { x: 5, y: 5 };
@@ -58,8 +65,6 @@ function checkCollision() {
   }
 }
 
-
-
 async function updateScoresServer(score) {
   const username = getPlayerName();
   const date = new Date().toLocaleDateString();
@@ -84,7 +89,6 @@ function gameOver() {
   saveScore(score);
   updateScoresServer(score); // Update the server with the final score
 }
-
 
 function clearBoard() {
   ctx.clearRect(0, 0, gameBoard.width, gameBoard.height);
@@ -134,20 +138,20 @@ async function saveScore(score) {
   const newScore = { name: username, score: score, date: date };
 
   try {
+    broadcastEvent(username, GameEndEvent, newScore, socket);
+
     const response = await fetch('/api/scores', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(newScore),
     });
 
-    // Store what the service gave us as the high scores
     const scores = await response.json();
     localStorage.setItem('scores', JSON.stringify(scores));
-  } catch {
-    // If there was an error then just track scores locally
+  } catch (error) {
+    console.error('Error saving score:', error);
     updateScoresLocal(newScore);
   }
-
 }
 
 function updateScoresLocal(newScore) {
@@ -176,12 +180,31 @@ function updateScoresLocal(newScore) {
 
   localStorage.setItem('scores', JSON.stringify(scores));
 }
-function simulateChat() {
-  const chatText = document.querySelector('.chat');
-  const newScore = Math.floor(Math.random() * 1000);
-  const message = `<div class="event"><span class="player-event">${getPlayerName()}</span> scored ${newScore}</div>`;
-  chatText.insertAdjacentHTML('afterbegin', message);
-  saveScore(newScore); // Save the score when simulating chat
+
+function configureWebSocket(protocol) {
+  const socket = new WebSocket(`${protocol}://${window.location.host}/ws`);
+  socket.onopen = (event) => {
+    displayMsg('system', 'game', 'connected');
+  };
+  socket.onclose = (event) => {
+    displayMsg('system', 'game', 'disconnected');
+  };
+  socket.onmessage = async (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === GameEndEvent) {
+      displayMsg('player', msg.from, `scored ${msg.value.score}`);
+    } else if (msg.type === GameStartEvent) {
+      displayMsg('player', msg.from, `started a new game`);
+    }
+  };
+
+  return socket;
+}
+
+function displayMsg(cls, from, msg) {
+  const chatText = document.querySelector('#player-messages');
+  chatText.innerHTML =
+    `<div class="event"><span class="${cls}-event">${from}</span> ${msg}</div>` + chatText.innerHTML;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -195,13 +218,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+function broadcastEvent(from, type, value, socket) {
+  const event = {
+    from: from,
+    type: type,
+    value: value,
+  };
+  socket.send(JSON.stringify(event));
+}
+
 // Get a reference to the restart button
 const restartButton = document.getElementById("restart-button");
 
 // Add a click event listener to the restart button
 restartButton.addEventListener("click", () => {
   resetGame();
+  broadcastEvent(getPlayerName(), GameStartEvent, {}, socket);
 });
+
 
 
 function resetGame() {
