@@ -92,3 +92,21 @@ this is for saving the login.
 - **existing user** - stores players under the same user if the user already exists.
 - **Use MongoDB to store credentials** - Stores both user and score 
 - **Restricts functionality** - You can not play untile you log in 
+
+## WebSocket deliverable
+
+For this deliverable I used webSocket to update the votes on the frontend in realtime.
+
+- **Backend listens for WebSocket connection** - done!
+- **Frontend makes WebSocket connection** - done!
+- **Data sent over WebSocket connection** - done!
+- **WebSocket data displayed** - All user votes display in realtime. I'm really proud that this is working. Way cool!
+
+## React deliverable
+
+For this deliverable I converted the application over to use Vue. I know it is supposed to use React, but the instructor said I could use Vue because I already have extensive experience with React.
+
+- **Bundled and transpiled** - done!
+- **Components** - Login, voting list, vote are all components.
+- **Router** - Routing between login and voting components.
+- **Hooks** - Vue uses class properties instead of `UseState` to track changes in vote state.
