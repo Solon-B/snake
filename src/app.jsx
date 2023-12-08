@@ -6,6 +6,9 @@ import { Login } from './login/login';
 import { About } from './about/about';
 import { Scores } from './scores/scores';
 import { Difficulty } from './difficulty/difficulty';
+import { Play_hard } from './play_hard/Play_hard';
+import { Play_medium } from './play_medium/play_medium';
+import { Play_easy } from './play_easy/Play_easy';
 
 function NotFound() {
     return <main className='container-fluid bg-secondary text-center'>404: Return to sender. Address unknown.</main>;
@@ -36,7 +39,10 @@ export default function App() {
 
     <Routes>
     <Route path='/' element={<Login />} exact />
-    <Route path='/play' element={<Difficulty />} />
+    <Route path='/difficulty' element={<Difficulty />} />
+    <Route path='/play_hard' element={<Play_hard />} /> 
+    <Route path='/play_easy' element={<Play_easy />} /> 
+    <Route path='/play_medium' element={<Play_medium />} /> 
     <Route path='/scores' element={<Scores />} />
     <Route path='/about' element={<About />} />
     <Route path='*' element={<NotFound />} />

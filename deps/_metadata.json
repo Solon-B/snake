@@ -1,0 +1,47 @@
+{
+  "hash": "08e3f80f",
+  "browserHash": "79b3505f",
+  "optimized": {
+    "react": {
+      "src": "../../../../../../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "5a6c758b",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../../../../../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "40a63d4a",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../../../../../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "42602b4b",
+      "needsInterop": false
+    },
+    "react-bootstrap/Button": {
+      "src": "../../../../../../../node_modules/react-bootstrap/esm/Button.js",
+      "file": "react-bootstrap_Button.js",
+      "fileHash": "01886ae1",
+      "needsInterop": false
+    },
+    "react-bootstrap/Modal": {
+      "src": "../../../../../../../node_modules/react-bootstrap/esm/Modal.js",
+      "file": "react-bootstrap_Modal.js",
+      "fileHash": "c44b1c39",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-RCAYRH57": {
+      "file": "chunk-RCAYRH57.js"
+    },
+    "chunk-KN456FUJ": {
+      "file": "chunk-KN456FUJ.js"
+    },
+    "chunk-6N4M7CMQ": {
+      "file": "chunk-6N4M7CMQ.js"
+    }
+  }
+}
