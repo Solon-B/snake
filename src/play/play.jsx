@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { Players } from './players';
-import { SnakeGame } from './snakeGame';
+import { SimonGame } from './simonGame';
 
-export function Play_hard(props) {
+export function Play(props) {
   return (
     <main className='bg-secondary'>
       <Players userName={props.userName} />
-      <SnakeGame userName={props.userName} />
+      <SimonGame userName={props.userName} />
     </main>
   );
 }

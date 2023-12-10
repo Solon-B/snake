@@ -1,9 +1,13 @@
 import React from 'react';
 
-export function Play_easy() {
+import { Players } from './players';
+import { SnakeGame } from './snakeGame';
+
+export function Play_easy(props) {
   return (
-    <main className='container-fluid bg-secondary text-center'>
-      <div>difficulty displayed here easy</div>
+    <main className='bg-secondary'>
+      <Players userName={props.userName} />
+      <SnakeGame userName={props.userName} />
     </main>
   );
 }
