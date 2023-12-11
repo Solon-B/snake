@@ -104,9 +104,9 @@ For this deliverable I used webSocket to update the votes on the frontend in rea
 
 ## React deliverable
 
-For this deliverable I converted the application over to use Vue. I know it is supposed to use React, but the instructor said I could use Vue because I already have extensive experience with React.
+For this deliverable I converted the application over to use react. 
 
 - **Bundled and transpiled** - done!
-- **Components** - Login, voting list, vote are all components.
-- **Router** - Routing between login and voting components.
-- **Hooks** - Vue uses class properties instead of `UseState` to track changes in vote state.
+- **Components** - Login, saving scores.
+- **Router** - Routing between login and score components.
+- **Hooks** - using UseState to track changes in score and login.
