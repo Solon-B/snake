@@ -20,23 +20,49 @@ class GameEventNotifier {
     let port = window.location.port;
     const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
     this.socket = new WebSocket(`${protocol}://${window.location.hostname}:${port}/ws`);
+
     this.socket.onopen = (event) => {
-      this.receiveEvent(new EventMessage('Simon', GameEvent.System, { msg: 'connected' }));
+      console.log('WebSocket connection opened successfully');
+      this.receiveEvent(new EventMessage(getPlayerName(), GameEvent.System, { msg: 'connected' }));
     };
+
     this.socket.onclose = (event) => {
-      this.receiveEvent(new EventMessage('Simon', GameEvent.System, { msg: 'disconnected' }));
+      console.log('WebSocket connection closed');
+      this.receiveEvent(new EventMessage(getPlayerName(), GameEvent.System, { msg: 'disconnected' }));
     };
+
     this.socket.onmessage = async (msg) => {
       try {
-        const event = JSON.parse(await msg.data.text());
+        let textData;
+    
+        if (msg.data instanceof Blob) {
+          // Handle Blob data
+          textData = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsText(msg.data);
+          });
+        } else {
+          // Handle other data types (such as strings)
+          textData = msg.data;
+        }
+    
+        console.log('Received WebSocket data:', textData);
+        const event = JSON.parse(textData);
         this.receiveEvent(event);
-      } catch {}
+      } catch (error) {
+        console.error('Error processing WebSocket message:', error);
+      }
     };
   }
 
   broadcastEvent(from, type, value) {
-    const event = new EventMessage(from, type, value);
-    this.socket.send(JSON.stringify(event));
+    if (this.socket.readyState === WebSocket.OPEN) {
+      const event = new EventMessage(from, type, value);
+      this.socket.send(JSON.stringify(event));
+    } else {
+      console.error('WebSocket connection is not open');
+    }
   }
 
   addHandler(handler) {
@@ -44,19 +70,24 @@ class GameEventNotifier {
   }
 
   removeHandler(handler) {
-    this.handlers.filter((h) => h !== handler);
+    this.handlers = this.handlers.filter((h) => h !== handler);
   }
 
   receiveEvent(event) {
+    console.log('Received event:', event); // Add this line to log the received event
+
     this.events.push(event);
 
-    this.events.forEach((e) => {
-      this.handlers.forEach((handler) => {
-        handler(e);
-      });
+    this.handlers.forEach((handler) => {
+      handler(event);
     });
   }
 }
 
+function getPlayerName() {
+  const playerName = localStorage.getItem('userName');
+  return playerName || 'Mystery Player';
+}
+
 const GameNotifier = new GameEventNotifier();
-export { GameEvent, GameNotifier };
+export { GameEvent, GameNotifier, getPlayerName };

@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import './scores.css';
+
 
 export function Scores() {
   const [scores, setScores] = useState([]);
@@ -8,17 +8,24 @@ export function Scores() {
   const loadScores = async () => {
     try {
       const response = await fetch('/api/scores');
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const scoresData = await response.json();
-
       localStorage.setItem('scores', JSON.stringify(scoresData));
       setScores(scoresData);
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(scoresData));
+      }
     } catch (error) {
+      console.error('Error loading scores:', error);
       const scoresText = localStorage.getItem('scores');
       if (scoresText) {
         setScores(JSON.parse(scoresText));
       }
     }
   };
+  
 
   useEffect(() => {
     loadScores();

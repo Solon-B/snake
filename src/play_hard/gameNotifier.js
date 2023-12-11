@@ -20,65 +20,49 @@ class GameEventNotifier {
     let port = window.location.port;
     const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
     this.socket = new WebSocket(`${protocol}://${window.location.hostname}:${port}/ws`);
+
     this.socket.onopen = (event) => {
-      this.receiveEvent(new EventMessage('Simon', GameEvent.System, { msg: 'connected' }));
+      console.log('WebSocket connection opened successfully');
+      this.receiveEvent(new EventMessage(getPlayerName(), GameEvent.System, { msg: 'connected' }));
     };
+
     this.socket.onclose = (event) => {
-      this.receiveEvent(new EventMessage('Simon', GameEvent.System, { msg: 'disconnected' }));
+      console.log('WebSocket connection closed');
+      this.receiveEvent(new EventMessage(getPlayerName(), GameEvent.System, { msg: 'disconnected' }));
     };
-    this.socket.onmessage = (msg) => {
-      this.handleWebSocketData(msg.data);
-    };
-  }
 
-  async handleWebSocketData(data) {
-    try {
-      console.log('Received WebSocket data:', data);
-
-      let textData;
-
-      if (data instanceof Blob) {
-        // Handle Blob data
-        textData = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.readAsText(data);
-        });
-      } else {
-        // Handle JSON data
-        textData = data;
+    this.socket.onmessage = async (msg) => {
+      try {
+        let textData;
+    
+        if (msg.data instanceof Blob) {
+          // Handle Blob data
+          textData = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsText(msg.data);
+          });
+        } else {
+          // Handle other data types (such as strings)
+          textData = msg.data;
+        }
+    
+        console.log('Received WebSocket data:', textData);
+        const event = JSON.parse(textData);
+        this.receiveEvent(event);
+      } catch (error) {
+        console.error('Error processing WebSocket message:', error);
       }
-
-      console.log('Text data:', textData);
-      this.receiveEvent(JSON.parse(textData));
-    } catch (error) {
-      console.error('Error processing WebSocket message:', error);
-    }
+    };
   }
 
   broadcastEvent(from, type, value) {
-    const event = new EventMessage(from, type, value);
-
-    // Assuming the type 'gameStart' and 'gameEnd' are used for game-related events
-    if (type === GameEvent.Start || type === GameEvent.End) {
-      // Send the game-related events to the server
-      this.sendToServer(event);
-    } else {
-      // Otherwise, send the event to other clients
+    if (this.socket.readyState === WebSocket.OPEN) {
+      const event = new EventMessage(from, type, value);
       this.socket.send(JSON.stringify(event));
+    } else {
+      console.error('WebSocket connection is not open');
     }
-  }
-
-  sendToServer(event) {
-    // Adjust this function based on your server's API
-    fetch('/api/gameEvent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(event),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log('Server response:', data))
-      .catch((error) => console.error('Error sending event to server:', error));
   }
 
   addHandler(handler) {
@@ -90,11 +74,20 @@ class GameEventNotifier {
   }
 
   receiveEvent(event) {
+    console.log('Received event:', event); // Add this line to log the received event
+
+    this.events.push(event);
+
     this.handlers.forEach((handler) => {
       handler(event);
     });
   }
 }
 
+function getPlayerName() {
+  const playerName = localStorage.getItem('userName');
+  return playerName || 'Mystery Player';
+}
+
 const GameNotifier = new GameEventNotifier();
-export { GameEvent, GameNotifier };
+export { GameEvent, GameNotifier, getPlayerName };

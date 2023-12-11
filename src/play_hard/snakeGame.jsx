@@ -22,16 +22,16 @@ export function SnakeGame() {
     const username = getPlayerName();
     const date = new Date().toLocaleDateString();
     const newScore = { name: username, score: score, date: date };
-  
+
     try {
       GameNotifier.broadcastEvent(username, GameEvent.End, newScore);
-  
+
       const response = await fetch('/api/scores', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(newScore),
       });
-  
+
       const scores = await response.json();
       localStorage.setItem('scores', JSON.stringify(scores));
     } catch (error) {
@@ -193,9 +193,11 @@ export function SnakeGame() {
 
   function gameOver() {
     clearInterval(gameIntervalRef.current); // Use the ref to clear the interval
-    alert(`Game Over! Your score: ${score}`);
-    saveScore(score);
-    updateScoresServer(score); // Update the server with the final score
+    const finalScore = score;
+    alert(`Game Over! Your score: ${finalScore}`);
+    saveScore(finalScore);
+    updateScoresServer(finalScore); // Update the server with the final score
+    window.location.reload(); // Reload the webpage
   }
 
   useEffect(() => {
@@ -206,16 +208,10 @@ export function SnakeGame() {
   }, [dx, dy]);
 
   return (
-    <main className="container-fluid bg-dark text-center">
-      <div className="players">
-        Player
-        <span className="player-name"></span>
-        <div id="player-messages"></div>
-      </div>
-
-      <div className="container" id="game-container">
-        <h1>SnakeKing</h1>
-        <p>Player: <span id="username"></span></p>
+<main className="container-fluid bg-dark text-center" style={{ padding: 0 }}>
+  <div className="container" id="game-container">
+    <h1 style={{ margin: 0 }}>SnakeKing</h1>
+        <p>Player: <span className="player-name">{getPlayerName()}</span></p>
         <div id="game-board-container">
           <canvas id="game-board" width="500" height="300" style={{ border: '1.5px solid red' }}></canvas>
         </div>

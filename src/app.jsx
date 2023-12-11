@@ -29,7 +29,7 @@ export default function App() {
             </NavLink>
             <menu className="navbar-nav">
               <li className="nav-item">
-                <NavLink className="nav-link active" to=" ">
+                <NavLink className="nav-link" to=" ">
                   Home
                 </NavLink>
               </li>
@@ -39,7 +39,7 @@ export default function App() {
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink className="nav-link active" to="difficulty">
+                <NavLink className="nav-link" to="difficulty">
                   Difficulty
                 </NavLink>
               </li>
