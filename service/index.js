@@ -23,7 +23,7 @@ app.use(express.static('public'));
 app.set('trust proxy', true);
 
 // Router for service endpoints
-var apiRouter = express.Router();
+const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 // CreateAuth token for a new user
@@ -73,11 +73,11 @@ apiRouter.get('/user/:email', async (req, res) => {
 });
 
 // secureApiRouter verifies credentials for endpoints
-var secureApiRouter = express.Router();
+const secureApiRouter = express.Router();
 apiRouter.use(secureApiRouter);
 
 secureApiRouter.use(async (req, res, next) => {
-  authToken = req.cookies[authCookieName];
+  const authToken = req.cookies[authCookieName];
   const user = await DB.getUserByToken(authToken);
   if (user) {
     next();
@@ -87,13 +87,13 @@ secureApiRouter.use(async (req, res, next) => {
 });
 
 // GetScores
-secureApiRouter.get('/score', async (req, res) => {
+secureApiRouter.get('/scores', async (req, res) => {
   const scores = await DB.getHighScores();
   res.send(scores);
 });
 
 // SubmitScore
-secureApiRouter.post('/scores', async (req, res) => {
+secureApiRouter.post('/score', async (req, res) => {
   const score = { ...req.body, ip: req.ip };
   await DB.addScore(score);
   const scores = await DB.getHighScores();

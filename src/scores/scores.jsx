@@ -1,57 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+
 import './scores.css';
 
-
 export function Scores() {
-  const [scores, setScores] = useState([]);
+  const [scores, setScores] = React.useState([]);
 
-  const loadScores = async () => {
-    try {
-      const response = await fetch('/api/scores');
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const scoresData = await response.json();
-      localStorage.setItem('scores', JSON.stringify(scoresData));
-      setScores(scoresData);
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify(scoresData));
-      }
-    } catch (error) {
-      console.error('Error loading scores:', error);
-      const scoresText = localStorage.getItem('scores');
-      if (scoresText) {
-        setScores(JSON.parse(scoresText));
-      }
-    }
-  };
-  
+  // Demonstrates calling a service asynchronously so that
+  // React can properly update state objects with the results.
+  React.useEffect(() => {
+    fetch('/api/scores')
+      .then((response) => response.json())
+      .then((scores) => {
+        setScores(scores);
+        localStorage.setItem('scores', JSON.stringify(scores));
+      })
+      .catch(() => {
+        const scoresText = localStorage.getItem('scores');
+        if (scoresText) {
+          setScores(JSON.parse(scoresText));
+        }
+      });
+  }, []);
 
-  useEffect(() => {
-    loadScores();
-  }, []); // Empty dependency array ensures the effect runs only once after initial render
-
-  const displayScores = () => {
-    return scores.length ? (
-      scores.map((score, index) => (
-        <tr key={index}>
-          <td>{index + 1}</td>
-          <td>{score.name}</td>
+  // Demonstrates rendering an array with React
+  const scoreRows = [];
+  if (scores.length) {
+    for (const [i, score] of scores.entries()) {
+      scoreRows.push(
+        <tr key={i}>
+          <td>{i}</td>
+          <td>{score.name.split('@')[0]}</td>
           <td>{score.score}</td>
           <td>{score.date}</td>
         </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan="4">Be the first to score</td>
+      );
+    }
+  } else {
+    scoreRows.push(
+      <tr key='0'>
+        <td colSpan='4'>Be the first to score</td>
       </tr>
     );
-  };
+  }
 
   return (
-    <main className="container-fluid bg-secondary text-center">
-      <table className="table table-warning table-striped-columns">
-        <thead className="table-dark">
+    <main className='container-fluid bg-secondary text-center'>
+      <table className='table table-warning table-striped-columns'>
+        <thead className='table-dark'>
           <tr>
             <th>#</th>
             <th>Name</th>
@@ -59,7 +54,7 @@ export function Scores() {
             <th>Date</th>
           </tr>
         </thead>
-        <tbody id="scores">{displayScores()}</tbody>
+        <tbody id='scores'>{scoreRows}</tbody>
       </table>
     </main>
   );
