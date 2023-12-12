@@ -106,7 +106,7 @@ For this deliverable I used webSocket to update the votes on the frontend in rea
 
 For this deliverable I converted the application over to use react. 
 
-- **Bundled and transpiled** - done!
+- **Bundled and transpiled** - done! 
 - **Components** - Login, saving scores.
 - **Router** - Routing between login and score components.
 - **Hooks** - using UseState to track changes in score and login.
